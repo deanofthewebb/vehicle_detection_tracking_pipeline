@@ -1,4 +1,8 @@
 .ipynb_checkpoints
 __pycache__
-data/
+data/pipeline_setup_images/*
+data/training_set/*
+data/vehicles.zip
+data/non-vehicles.zip
+vehicle-detection-setup-1.ipynb
 .DS_Store
