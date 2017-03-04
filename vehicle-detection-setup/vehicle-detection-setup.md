@@ -61,7 +61,7 @@ else:
 
 ## Feature Extraction Parameters ##
 # Spatial Binning
-SPATIAL = 20
+SPATIAL = 16
 BIN_SPATIAL_SIZE = (SPATIAL, SPATIAL)
 # Color Histogram
 HIST_NBINS = 128
@@ -236,8 +236,8 @@ print('Using Spatial Binning of:',BIN_SPATIAL_SIZE[0],
     'and', HIST_NBINS,'histogram bins')
 ```
 
-    Feature Vector size for Cars: 6876
-    Using Spatial Binning of: 20 and 128 histogram bins
+    Feature Vector size for Cars: 6444
+    Using Spatial Binning of: 16 and 128 histogram bins
 
 
 
@@ -259,7 +259,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 print('Feature vector length:', len(X_train[0]))
 ```
 
-    Feature vector length: 6876
+    Feature vector length: 6444
 
 
 
@@ -282,21 +282,21 @@ t2 = time.time()
 print(round(t2-t, 5), 'Seconds to predict', n_predict,'labels with SVC')
 ```
 
-    37.23 Seconds to train SVC...
-    Test Accuracy of SVC =  0.9886
-    My SVC predicts:  [ 0.  0.  1.  0.  0.  0.  1.  1.  0.  1.  0.  0.  1.  0.  0.  1.  0.  0.
-      0.  1.  0.  1.  0.  0.  1.  1.  0.  1.  0.  0.  0.  1.  0.  0.  1.  1.
-      0.  0.  0.  1.  0.  0.  1.  1.  1.  1.  0.  1.  1.  1.  1.  0.  1.  1.
-      0.  0.  1.  0.  0.  0.  1.  1.  0.  1.  1.  0.  1.  1.  0.  1.  1.  0.
-      0.  1.  1.  1.  1.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.  1.  0.  1.
-      1.  1.  1.  1.  0.  0.  0.  1.  1.  1.]
-    For these 100 labels:  [ 0.  0.  1.  0.  0.  0.  1.  1.  0.  1.  0.  0.  1.  0.  0.  1.  0.  0.
-      0.  1.  0.  1.  0.  0.  1.  1.  0.  1.  0.  0.  0.  1.  0.  0.  1.  1.
-      0.  0.  0.  1.  0.  0.  1.  1.  1.  1.  0.  1.  1.  1.  1.  0.  1.  1.
-      0.  0.  1.  0.  0.  0.  1.  1.  0.  1.  1.  0.  1.  1.  0.  1.  1.  0.
-      0.  1.  1.  1.  1.  0.  0.  0.  0.  0.  1.  0.  0.  1.  0.  1.  0.  1.
-      1.  1.  1.  1.  0.  0.  0.  1.  1.  1.]
-    0.02039 Seconds to predict 100 labels with SVC
+    33.34 Seconds to train SVC...
+    Test Accuracy of SVC =  0.9891
+    My SVC predicts:  [ 1.  1.  1.  1.  0.  1.  1.  0.  1.  1.  0.  0.  0.  1.  1.  1.  1.  1.
+      1.  0.  0.  0.  0.  0.  1.  0.  1.  1.  0.  0.  0.  0.  0.  0.  0.  1.
+      0.  0.  0.  1.  1.  0.  0.  1.  0.  0.  1.  1.  1.  1.  1.  0.  1.  1.
+      1.  1.  0.  0.  0.  0.  0.  1.  1.  0.  0.  0.  0.  1.  0.  1.  1.  1.
+      0.  1.  0.  0.  1.  1.  1.  0.  1.  1.  1.  1.  1.  1.  1.  1.  0.  1.
+      1.  1.  0.  1.  0.  0.  0.  0.  0.  1.]
+    For these 100 labels:  [ 1.  1.  1.  1.  0.  1.  1.  0.  1.  1.  0.  0.  0.  1.  1.  1.  1.  1.
+      1.  0.  0.  0.  0.  0.  1.  0.  1.  1.  0.  0.  0.  0.  0.  0.  0.  1.
+      0.  0.  0.  1.  1.  0.  0.  1.  0.  0.  1.  0.  1.  1.  1.  0.  1.  1.
+      1.  1.  0.  0.  0.  0.  0.  1.  1.  0.  0.  0.  0.  1.  0.  1.  1.  1.
+      0.  1.  0.  0.  1.  1.  1.  0.  1.  1.  1.  1.  1.  1.  1.  1.  0.  1.
+      1.  1.  0.  1.  0.  0.  0.  0.  0.  1.]
+    0.0769 Seconds to predict 100 labels with SVC
 
 
 
@@ -369,15 +369,20 @@ HOG_CHANNEL = svc_hyperparameters['HOG_CHANNEL'] # Can be 0, 1, 2, or "ALL"
 print('svc', SVC)
 print('X_scaler', X_SCALER)
 
-## Sliding Windows Parameters ##
 BBOX_COLOR = (0, 0, 255)
 BBOX_THICK = 6
 
-SW_YSTART = 355
-SW_YSTOP = 670
-SW_SCALE = 1.75
-SW_XY_WINDOW = 135
-SW_XY_OVERLAP = 0.71
+## Sliding Windows Parameters - Horizon ##
+SW_YSTART_HORIZON = 350
+SW_YSTOP_HORIZON = 542
+SW_XY_WINDOW_HORIZON = 96
+SW_XY_OVERLAP_HORIZON = 0.75
+
+## Sliding Windows Parameters - Foreground ##
+SW_YSTART_FOREGROUND = 355
+SW_YSTOP_FOREGROUND = 670
+SW_XY_WINDOW_FOREGROUND = 192
+SW_XY_OVERLAP_FOREGROUND = 0.50
 
 SW_SPATIAL_FEAT_FLAG = True
 SW_HOG_FEAT_FLAG = True
@@ -410,8 +415,8 @@ def draw_boxes(img, bboxes, color=BBOX_COLOR, thick=BBOX_THICK):
 # start and stop positions in both x and y, 
 # window size (x and y dimensions),  
 # and overlap fraction (for both x and y)
-def slide_window(img, x_start_stop=[None, None], y_start_stop=[SW_YSTART, SW_YSTOP], 
-                    xy_window=(SW_XY_WINDOW, SW_XY_WINDOW), xy_overlap=(SW_XY_OVERLAP, SW_XY_OVERLAP)):
+def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None], 
+                    xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     # If x and/or y start/stop positions not defined, set to image size
     if x_start_stop[0] == None:
         x_start_stop[0] = 0
@@ -566,51 +571,97 @@ print('Found',len(image_paths),'images in directory:', testset_path)
 ```python
 # Define a single function that can extract features using hog sub-sampling and make predictions
 images = []
-titles = []
 
-y_start_stop = [SW_YSTART, SW_YSTOP] # Min/Max in y to search in slide_window()
+titles = []
+## Sliding Windows Parameters - Horizon ##
+SW_YSTART_HORIZON = 365
+SW_YSTOP_HORIZON = 570
+SW_XY_WINDOW_HORIZON = 96
+SW_XY_OVERLAP_HORIZON = 0.65
+
+## Sliding Windows Parameters - Foreground ##
+SW_YSTART_FOREGROUND = 375
+SW_YSTOP_FOREGROUND = 670
+SW_XY_WINDOW_FOREGROUND = 145
+SW_XY_OVERLAP_FOREGROUND = 0.770
+
+
+y_start_stop_horizon = [SW_YSTART_HORIZON, SW_YSTOP_HORIZON] # Min/Max in y to search in slide_window()
+y_start_stop_foreground = [SW_YSTART_FOREGROUND, SW_YSTOP_FOREGROUND] # Min/Max in y to search in slide_window()
 
 for img_path in image_paths:
     t1 = time.time()
     img = mpimg.imread(img_path)
     draw_img = np.copy(img)
     img = normalize_pixels(img).astype(np.float32)
+    windows = []
+    hot_windows = []
     
-    windows = slide_window(img, x_start_stop=[None,None], y_start_stop=y_start_stop, 
-                           xy_window=(SW_XY_WINDOW,SW_XY_WINDOW))
+    
+    # Horizon Check
+    windows_1 = slide_window(img, x_start_stop=[None,None], y_start_stop=y_start_stop_horizon, 
+                           xy_window=(SW_XY_WINDOW_HORIZON,SW_XY_WINDOW_HORIZON), 
+                           xy_overlap=(SW_XY_OVERLAP_HORIZON,SW_XY_OVERLAP_HORIZON))
 
-    hot_windows = search_windows(img, windows, SVC, X_SCALER, color_space=COLOR_SPACE,
+    hot_windows_1 = search_windows(img, windows_1, SVC, X_SCALER, color_space=COLOR_SPACE,
                                  spatial_size=BIN_SPATIAL_SIZE, hist_bins=HIST_NBINS, orient=HOG_ORIENTATIONS,
                                  pix_per_cell=HOG_PIXELS_PER_CELL, cell_per_block=HOG_CELLS_PER_BLOCK,
                                  hog_channel=HOG_CHANNEL, spatial_feat=SW_SPATIAL_FEAT_FLAG, hog_feat=SW_HOG_FEAT_FLAG,
                                  hist_feat=SW_COLOR_HIST_FEAT_FLAG)
 
+    print('BBoxes Found - Horizon:', len(hot_windows_1))
+    windows.extend(windows_1)
+    hot_windows.extend(hot_windows_1)
     
+    # Foreground Check
+    windows_2 = slide_window(img, x_start_stop=[None,None], y_start_stop=y_start_stop_foreground, 
+                           xy_window=(SW_XY_WINDOW_FOREGROUND,SW_XY_WINDOW_FOREGROUND), 
+                           xy_overlap=(SW_XY_OVERLAP_FOREGROUND,SW_XY_OVERLAP_FOREGROUND))
+
+    hot_windows_2 = search_windows(img, windows_2, SVC, X_SCALER, color_space=COLOR_SPACE,
+                                 spatial_size=BIN_SPATIAL_SIZE, hist_bins=HIST_NBINS, orient=HOG_ORIENTATIONS,
+                                 pix_per_cell=HOG_PIXELS_PER_CELL, cell_per_block=HOG_CELLS_PER_BLOCK,
+                                 hog_channel=HOG_CHANNEL, spatial_feat=SW_SPATIAL_FEAT_FLAG, hog_feat=SW_HOG_FEAT_FLAG,
+                                 hist_feat=SW_COLOR_HIST_FEAT_FLAG)
+
+
+    print('BBoxes Found - Foreground:', len(hot_windows_2))
+    windows.extend(windows_2)
+    hot_windows.extend(hot_windows_2)
+
     window_img = draw_boxes(draw_img, hot_windows, color=BBOX_COLOR, thick=BBOX_THICK)
     images.append(window_img)
     titles.append('')
+    
     print(time.time()-t1, 'seconds to process one image search', len(windows), 'windows')
     
 fig = plt.figure(figsize=(12,18), dpi=300)
 visualize(fig, 5, 2, images, titles)
 ```
 
-    1.2541630268096924 seconds to process one image search 150 windows
-    1.1899199485778809 seconds to process one image search 150 windows
-    1.1865599155426025 seconds to process one image search 150 windows
-    0.9150760173797607 seconds to process one image search 150 windows
-    0.9235889911651611 seconds to process one image search 150 windows
-    0.9468629360198975 seconds to process one image search 150 windows
+    BBoxes Found - Horizon: 2
+    BBoxes Found - Foreground: 5
+    3.530806064605713 seconds to process one image search 319 windows
+    BBoxes Found - Horizon: 5
+    BBoxes Found - Foreground: 2
+    2.4570140838623047 seconds to process one image search 319 windows
+    BBoxes Found - Horizon: 0
+    BBoxes Found - Foreground: 2
+    2.225084066390991 seconds to process one image search 319 windows
+    BBoxes Found - Horizon: 5
+    BBoxes Found - Foreground: 5
+    2.5365240573883057 seconds to process one image search 319 windows
+    BBoxes Found - Horizon: 6
+    BBoxes Found - Foreground: 1
+    2.777930974960327 seconds to process one image search 319 windows
+    BBoxes Found - Horizon: 4
+    BBoxes Found - Foreground: 3
+    2.0762321949005127 seconds to process one image search 319 windows
 
 
 
 ![png](output_24_1.png)
 
-
-
-```python
-
-```
 
 
 ```python
