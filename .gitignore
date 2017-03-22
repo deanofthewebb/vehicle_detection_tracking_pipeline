@@ -4,5 +4,7 @@ data/pipeline_setup_images/*
 data/training_set/*
 data/vehicles.zip
 data/non-vehicles.zip
+data/object-detection-crowdai.tar.gz
+data/object-detection-crowdai/
 vehicle-detection-setup-1.ipynb
 .DS_Store
