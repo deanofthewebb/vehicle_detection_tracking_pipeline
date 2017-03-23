@@ -8,3 +8,9 @@ data/object-detection-crowdai.tar.gz
 data/object-detection-crowdai/
 vehicle-detection-setup-1.ipynb
 .DS_Store
+data/non-vehicles/
+data/vehicles/
+non-vehicles.zip
+vehicles.zip
+vehicle-detection-setup/*
+vehicle-detection-setup (3).ipynb
