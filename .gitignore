@@ -1,16 +1,34 @@
+
+# Python bytecode
+*.pyc
+
+# Weight files
+bin/
+
+# Test data
+test/*.jpg
+
+# Annotated test results
+results/
+
+# Intermediate training data
+backup/
+tfnet/yolo/parse-history.txt
+tfnet/yolo/*.parsed
+*.txt
+*.pb
+/profile
+/test.py
+
+data/
 .ipynb_checkpoints
-__pycache__
-data/pipeline_setup_images/*
-data/training_set/*
-data/vehicles.zip
+.DS_Store
 data/non-vehicles.zip
+data/non-vehicles/*
 data/object-detection-crowdai.tar.gz
 data/object-detection-crowdai/
-vehicle-detection-setup-1.ipynb
-.DS_Store
-data/non-vehicles/
-data/vehicles/
-non-vehicles.zip
-vehicles.zip
-vehicle-detection-setup/*
-vehicle-detection-setup (3).ipynb
+data/test_images/.DS_Store
+data/training_set/
+data/vehicles.zip
+data/vehicles
+examples/.DS_Store

@@ -1,33 +1,144 @@
-# Vehicle Detection
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+![img](cars.jpg)
 
+This package is originally implmented by @[thtrieu](https://github.com/thtrieu). The original yolo models are trained against the annotated Udacity SDC datasets, and is now capable of detecting cars, pedestrians and traffic lights. The performance is not perfect, but it does run at real-time on a GTX1070. Looking forward to more improvements from the Udacity community.
 
-In this project, your goal is to write a software pipeline to detect vehicles in a video (start with the test_video.mp4 and later implement on full project_video.mp4), but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
+## Dependencies
 
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
+Python3, tensorflow 0.12, numpy, opencv 3.
 
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
+## Update
 
-You can submit your writeup in markdown or use another method and submit a pdf instead.
+@[Ryansun](https://github.com/ryansun1900) contributed the **training part of YOLO9000**. The project is now completed :)
 
-The Project
----
+Someone's quick and 
+**Android demo is available on Tensorflow's official github!** [here](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/android/src/org/tensorflow/demo/TensorFlowYoloDetector.java)
 
-The goals / steps of this project are the following:
+**Demo in webcam is available!**. Use option `--demo camera` :)
 
-* Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier
-* Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
-* Note: for those first two steps don't forget to normalize your features and randomize a selection for training and testing.
-* Implement a sliding-window technique and use your trained classifier to search for vehicles in images.
-* Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
-* Estimate a bounding box for vehicles detected.
+YOLOv1 is up and running:
+- v1.0: `yolo-full` 1.1GB, `yolo-small` 376MB, `yolo-tiny` 180MB
+- v1.1: `yolov1` 789MB, `tiny-yolo` 108MB, `tiny-coco` 268MB, `yolo-coco` 937MB
 
-Here are links to the labeled data for [vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicle](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) examples to train your classifier.  These example images come from a combination of the [GTI vehicle image database](http://www.gti.ssr.upm.es/data/Vehicle_database.html), the [KITTI vision benchmark suite](http://www.cvlibs.net/datasets/kitti/), and examples extracted from the project video itself.   You are welcome and encouraged to take advantage of the recently released [Udacity labeled dataset](https://github.com/udacity/self-driving-car/tree/master/annotations) to augment your training data.  
+YOLO9000 is up and running:
+- `yolo` 270MB, `tiny-yolo-voc` 63 MB.
 
-Some example images for testing your pipeline on single frames are located in the `test_images` folder.  To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `ouput_images`, and include them in your writeup for the project by describing what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+### Parsing the annotations
 
-**As an optional challenge** Once you have a working pipeline for vehicle detection, add in your lane-finding algorithm from the last project to do simultaneous lane-finding and vehicle detection!
+Skip this if you are not training or fine-tuning anything (you simply want to forward flow a trained net)
 
-**If you're feeling ambitious** (also totally optional though), don't stop there!  We encourage you to go out and take video of your own, and show us how you would implement this project on a new video!
+For example, if you want to work with only 3 classes `tvmonitor`, `person`, `pottedplant`; edit `labels.txt` as follows
+
+```
+tvmonitor
+person
+pottedplant
+```
+
+And that's it. `darkflow` will take care of the rest.
+
+### Design the net
+
+Skip this if you are working with one of the three original configurations since they are already there. Otherwise, see the following example:
+
+```python
+...
+
+[convolutional]
+batch_normalize = 1
+size = 3
+stride = 1
+pad = 1
+activation = leaky
+
+[maxpool]
+
+[connected]
+output = 4096
+activation = linear
+
+...
+```
+
+### Flowing the graph using `flow`
+
+```bash
+# Have a look at its options
+./flow --h
+```
+
+First, let's take a closer look at one of a very useful option `--load`
+
+```bash
+# 1. Load yolo-tiny.weights
+./flow --model cfg/yolo-tiny.cfg --load bin/yolo-tiny.weights
+
+# 2. To completely initialize a model, leave the --load option
+./flow --model cfg/yolo-3c.cfg
+
+# 3. It is useful to reuse the first identical layers of tiny for 3c
+./flow --model cfg/yolo-3c.cfg --load bin/yolo-tiny.weights
+# this will print out which layers are reused, which are initialized
+```
+
+All input images from default folder `test/` are flowed through the net and predictions are put in `test/out/`. We can always specify more parameters for such forward passes, such as detection threshold, batch size, test folder, etc.
+
+```bash
+# Forward all images in test/ using tiny yolo and 100% GPU usage
+./flow --test test/ --model cfg/yolo-tiny.cfg --load bin/yolo-tiny.weights --gpu 1.0
+```
+
+### Training new model
+
+Training is simple as you only have to add option `--train` like below:
+
+```bash
+# Initialize yolo-3c from yolo-tiny, then train the net on 100% GPU:
+./flow --model cfg/yolo-3c.cfg --load bin/yolo-tiny.weights --train --gpu 1.0
+
+# Completely initialize yolo-3c and train it with ADAM optimizer
+./flow --model cfg/yolo-3c.cfg --train --trainer adam
+```
+
+During training, the script will occasionally save intermediate results into Tensorflow checkpoints, stored in `ckpt/`. To resume to any checkpoint before performing training/testing, use `--load [checkpoint_num]` option, if `checkpoint_num < 0`, `darkflow` will load the most recent save by parsing `ckpt/checkpoint`.
+
+```bash
+# Resume the most recent checkpoint for training
+./flow --train --model cfg/yolo-3c.cfg --load -1
+
+# Test with checkpoint at step 1500
+./flow --model cfg/yolo-3c.cfg --load 1500
+
+# Fine tuning yolo-tiny from the original one
+./flow --train --model cfg/yolo-tiny.cfg --load bin/yolo-tiny.weights
+```
+
+### Training against Udacity Self Driving Datasets
+
+Udacity Self Driving Car course have provided an annotated dataset of images that contains bounding boxes for five classes of objects: cars, pedestrians, truck, cyclists and traffic lights.
+
+A model cfg based on v1.1/tiny-yolo is provided for the udacity dataset in cfg/v1.1/tiny-yolov1-5c.cfg, with a TensorFlow checkpoint [here](https://drive.google.com/file/d/0B2K7eATT8qRARVVvcGtQUzRBV1E/view?usp=sharing). A v2 tiny-yolo configuration for the udacity dataset could be found under cfg/tiny-yolo-udacity.cfg, with checkpoint [here](https://drive.google.com/file/d/0B2K7eATT8qRAY0g0aWhjdkw0bEU/view?usp=sharing)
+
+To train tiny-yolov1.weights from for the udacity dataset, the following step was taken: 1. Download udacity dataset [here](http://bit.ly/udacity-annotations-autti) and download the following [annotation file](https://drive.google.com/file/d/0B2K7eATT8qRAZHlsdTVCNWVLVnM/view?usp=sharing).
+
+Create a small dataset with 3-5 images, and train via:
+```
+python3 flow --train --model cfg/v1.1/tiny-yolov1-5c.cfg --load tiny-yolov1.weights --dataset <folder to udacity images> --gpu 1.0
+```
+
+Reduce the learning rate in the cfg file, and continue training.
+```
+python3 flow --train --model cfg/v1.1/tiny-yolov1-5c.cfg --load -1 --dataset <folder to udacity images> --gpu 1.0
+```
+
+In general, above is a guideline to train against other datasets with different classes.
+
+### Migrating the graph to mobile devices (JAVA / C++ / Objective-C++)
+
+```bash
+## Saving the lastest checkpoint to protobuf file
+./flow --model cfg/yolo-3c.cfg --load -1 --savepb
+```
+
+For further usage of this protobuf file, please refer to the official documentation of `Tensorflow` on C++ API [_here_](https://www.tensorflow.org/versions/r0.9/api_docs/cc/index.html). To run it on, say, iOS application, simply add the file to Bundle Resources and update the path to this file inside source code.
+
+That's all.
